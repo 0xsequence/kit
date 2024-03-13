@@ -1,39 +1,35 @@
-import React from 'react'
-import { MethodArguments } from '../api'
 import { createGenericContext, Theme } from '@0xsequence/kit'
 
 interface CoinQuantity {
-  contractAddress: string,
-  amountRequiredRaw: string,
+  contractAddress: string
+  amountRequiredRaw: string
 }
 
 interface OrderSummaryItem {
-  contractAddress: string,
-  quantityRaw: string,
+  chainId: number
+  contractAddress: string
   tokenId: string
+  quantityRaw: string
 }
 
 export interface CheckoutSettings {
-  creditCardCheckout?: {
+  sardineCheckout?: {
+    defaultPaymentMethodType: 'us_debit' | 'us_credit' | 'international_debit' | 'international_credit' | 'ach'
     chainId: number
-    abi: string
-    methodName: string
+    platform: string
     contractAddress: string
+    blockchainNftId: string
     recipientAddress: string
-    receiptTitle: string
-    methodArguments: MethodArguments
-    currency: string
-    currencyAmount: string
-    collectionContractAddress?: string
-    email?: string
+    quantity: string
+    decimals?: string
     onSuccess?: (transactionHash: string) => void
     onError?: (error: Error) => void
-  },
+  }
   cryptoCheckout?: {
-    chainId: number,
-    triggerTransaction: () => void,
-    coinQuantity: CoinQuantity,
-  },
+    chainId: number
+    triggerTransaction: () => void
+    coinQuantity: CoinQuantity
+  }
   orderSummaryItems: OrderSummaryItem[]
 }
 

@@ -1,14 +1,6 @@
 import React from 'react'
 import { ethers } from 'ethers'
-import {
-  Box,
-  Button,
-  ChevronRightIcon,
-  Divider,
-  Text,
-  PaymentsIcon,
-  vars
-} from '@0xsequence/design-system'
+import { Box, Button, ChevronRightIcon, Divider, Text, PaymentsIcon, vars } from '@0xsequence/design-system'
 
 import { getNativeTokenInfoByChainId } from '@0xsequence/kit'
 
@@ -19,16 +11,8 @@ import { OrderSummaryItem } from './component/OrderSummaryItem'
 import { CoinIcon } from '../../shared/components/CoinIcon'
 import { Skeleton } from '../../shared/components/Skeleton'
 import { HEADER_HEIGHT } from '../../constants'
-import {
-  useNavigation,
-  useCheckoutModal,
-  useBalances,
-  useContractInfo,
-} from '../../hooks'
-import {
-  compareAddress,
-  formatDisplay
-} from '../../utils'
+import { useNavigation, useCheckoutModal, useBalances, useContractInfo, useTokenMetadata } from '../../hooks'
+import { compareAddress, formatDisplay } from '../../utils'
 import * as styles from './styles.css'
 
 export const CheckoutSelection = () => {
@@ -38,37 +22,31 @@ export const CheckoutSelection = () => {
   const { address: accountAddress } = useAccount()
 
   const cryptoCheckoutSettings = settings?.cryptoCheckout
-  // const creditCardCheckoutSettings = settings?.creditCardCheckout
+  const creditCardCheckoutSettings = settings?.sardineCheckout
   const displayCryptoCheckout = !!cryptoCheckoutSettings
-  // const displayCreditCardCheckout = !!creditCardCheckoutSettings
+  const displayCreditCardCheckout = !!creditCardCheckoutSettings
 
-  const {
-    data: contractInfoData,
-    isLoading: contractInfoLoading
-  } = useContractInfo({
+  const { data: contractInfoData, isLoading: contractInfoLoading } = useContractInfo({
     contractAddress: cryptoCheckoutSettings?.coinQuantity?.contractAddress || '',
     chainID: String(cryptoCheckoutSettings?.chainId || 1)
   })
 
-  const {
-    data: balancesData,
-    isLoading: balancesLoading
-  } = useBalances({
+  const { data: balancesData, isLoading: balancesLoading } = useBalances({
     accountAddress: accountAddress || '',
     chainId: cryptoCheckoutSettings?.chainId || 1
   })
 
   const isLoading = (contractInfoLoading || balancesLoading) && cryptoCheckoutSettings
 
-  const isNativeToken  = compareAddress(cryptoCheckoutSettings?.coinQuantity?.contractAddress || '', ethers.constants.AddressZero)
+  const isNativeToken = compareAddress(cryptoCheckoutSettings?.coinQuantity?.contractAddress || '', ethers.constants.AddressZero)
   const nativeTokenInfo = getNativeTokenInfoByChainId(cryptoCheckoutSettings?.chainId || 1, chains)
 
   const coinDecimals = isNativeToken ? nativeTokenInfo.decimals : contractInfoData?.decimals || 0
   const coinSymbol = isNativeToken ? nativeTokenInfo.symbol : contractInfoData?.symbol || 'COIN'
   const coinImageUrl = isNativeToken ? nativeTokenInfo.logoURI : contractInfoData?.logoURI || ''
-  const coinBalance = balancesData?.find(balance => (
+  const coinBalance = balancesData?.find(balance =>
     compareAddress(balance.contractAddress, cryptoCheckoutSettings?.coinQuantity?.contractAddress || '')
-  ))
+  )
   const userBalanceRaw = coinBalance ? coinBalance.balance : '0'
   const requestedAmountRaw = cryptoCheckoutSettings?.coinQuantity?.amountRequiredRaw || '0'
   const userBalance = ethers.utils.formatUnits(userBalanceRaw, coinDecimals)
@@ -77,12 +55,63 @@ export const CheckoutSelection = () => {
 
   const orderSummaryItems = settings?.orderSummaryItems || []
 
-  const chainId = settings?.cryptoCheckout?.chainId || 1
+  const chainId = settings?.cryptoCheckout?.chainId || settings?.sardineCheckout?.chainId || 1
+
+  const { data: tokenMetadata, isLoading: isTokenMetadataLoading } = useTokenMetadata({
+    chainId,
+    contractAddress: orderSummaryItems[0].contractAddress,
+    tokenId: orderSummaryItems[0].tokenId
+  })
+
+  const triggerSardineTransaction = async () => {
+    console.log('trigger sardine transaction')
+
+    const response = await fetch('https://api.sandbox.sardine.ai/v1/auth/client-tokens', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Basic ...' // add token
+      },
+      body: JSON.stringify({
+        referenceId: 'test-...', // add reference id
+        expiresIn: 3600,
+        paymentMethodTypeConfig: {
+          enabled: ['us_debit', 'us_credit', 'international_debit', 'international_credit', 'ach'],
+          default: 'us_debit'
+        },
+        nft: {
+          name: tokenMetadata?.name || 'Unknown',
+          imageUrl: tokenMetadata?.image || '',
+          network: 'polygon',
+          recipientAddress: '0xB62397749850CC20054a78737d8E3676a51e3e77',
+          platform: 'horizon',
+          blockchainNftId: '214',
+          contractAddress: '0xB537a160472183f2150d42EB1c3DD6684A55f74c',
+          executionType: 'smart_contract',
+          quantity: 1
+        }
+      })
+    })
+
+    const json = await response.json()
+    console.log(response, json)
+
+    if (json.clientToken) {
+      const url = `https://crypto.sandbox.sardine.ai/?client_token=${json.clientToken}&show_features=true`
+      const windowName = 'SardineCrypto'
+      const windowSize = 'width=800,height=600'
+      window.open(url, windowName, windowSize)
+    }
+  }
 
   const onClickPayWithCard = () => {
-    setNavigation({
-      location: 'transaction-form'
-    })
+    if (settings?.sardineCheckout) {
+      triggerSardineTransaction()
+    } else {
+      setNavigation({
+        location: 'transaction-form'
+      })
+    }
   }
 
   const onClickPayWithCrypto = () => {
@@ -91,7 +120,7 @@ export const CheckoutSelection = () => {
     transaction && transaction()
     closeCheckout()
   }
-  
+
   return (
     <Box
       paddingX="5"
@@ -106,12 +135,10 @@ export const CheckoutSelection = () => {
         <>
           <Text fontWeight="normal" fontSize="normal" color="text50">
             Order summary
-          </Text>      
+          </Text>
           <Box flexDirection="column" gap="2">
             {orderSummaryItems.map((orderSummaryItem, index) => {
-              return (
-                <OrderSummaryItem key={index} {...orderSummaryItem} chainId={chainId} />
-              )
+              return <OrderSummaryItem key={index} {...orderSummaryItem} chainId={chainId} />
             })}
           </Box>
           <Box marginTop="2">
@@ -124,7 +151,6 @@ export const CheckoutSelection = () => {
           </Box>
         </>
       )}
-
 
       {displayCryptoCheckout && (
         <Box justifyContent="space-between" alignItems="center">
@@ -144,13 +170,8 @@ export const CheckoutSelection = () => {
         </Box>
       )}
 
-      <Box
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        gap="2"
-      >
-        {/* {displayCreditCardCheckout && (
+      <Box flexDirection="column" alignItems="center" justifyContent="center" gap="2">
+        {displayCreditCardCheckout && (
           <Button
             style={{
               borderRadius: vars.radii.md,
@@ -160,12 +181,12 @@ export const CheckoutSelection = () => {
             borderRadius="md"
             leftIcon={PaymentsIcon}
             variant="primary"
-            label="Pay with credit card"
+            label="Pay with card"
             rightIcon={ChevronRightIcon}
             onClick={onClickPayWithCard}
           />
-        )} */}
-        {displayCryptoCheckout && (!isInsufficientBalance && !isLoading) && (
+        )}
+        {displayCryptoCheckout && !isInsufficientBalance && !isLoading && (
           <Button
             style={{
               borderRadius: vars.radii.md,
@@ -201,15 +222,10 @@ export const CheckoutSelection = () => {
           {isLoading ? (
             <Skeleton width="102px" height="14px" />
           ) : (
-            <Text
-              fontWeight="bold"
-              fontSize="small"
-              color="text50"
-            >
+            <Text fontWeight="bold" fontSize="small" color="text50">
               Balance: {`${formatDisplay(userBalance)} ${coinSymbol}`}
             </Text>
           )}
-
         </Box>
       )}
     </Box>

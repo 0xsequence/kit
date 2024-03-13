@@ -1,28 +1,18 @@
 import React, { useState, useEffect } from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import {
-  Box,
-  Modal,
-  ThemeProvider,
-} from '@0xsequence/design-system'
+import { Box, Modal, ThemeProvider } from '@0xsequence/design-system'
 import { AnimatePresence } from 'framer-motion'
 
 import { getModalPositionCss, useTheme } from '@0xsequence/kit'
 
 import {
-  PaperTransactionForm,
+  // PaperTransactionForm,
   PendingTransaction,
   TransactionError,
   TransactionSuccess,
-  CheckoutSelection,
+  CheckoutSelection
 } from '../../views'
-import {
-  History,
-  Navigation,
-  NavigationContextProvider,
-  CheckoutModalContextProvider,
-  CheckoutSettings
-} from '../../contexts'
+import { History, Navigation, NavigationContextProvider, CheckoutModalContextProvider, CheckoutSettings } from '../../contexts'
 
 import { NavigationHeader } from '../../shared/components/NavigationHeader'
 import * as sharedStyles from '../../shared/styles.css'
@@ -30,12 +20,12 @@ import * as sharedStyles from '../../shared/styles.css'
 import '@0xsequence/design-system/styles.css'
 
 export type KitCheckoutProvider = {
-  children: React.ReactNode,
+  children: React.ReactNode
 }
 
 export const DEFAULT_LOCATION: Navigation = {
-    location: 'select-method-checkout'
-  }
+  location: 'select-method-checkout'
+}
 
 // export const DEFAULT_LOCATION: Navigation = {
 //   location: 'transaction-form',
@@ -67,7 +57,7 @@ export const KitCheckoutProvider = (props: KitCheckoutProvider) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <KitCheckoutContent  {...props} />
+      <KitCheckoutContent {...props} />
     </QueryClientProvider>
   )
 }
@@ -100,8 +90,8 @@ export const KitCheckoutContent = ({ children }: KitCheckoutProvider) => {
       case 'transaction-error':
         return <TransactionError />
       case 'transaction-form':
-      default:
-        return <PaperTransactionForm />
+      // default:
+      //   return <PaperTransactionForm />
     }
   }
 
@@ -115,7 +105,7 @@ export const KitCheckoutContent = ({ children }: KitCheckoutProvider) => {
       case 'transaction-pending':
         return <NavigationHeader disableBack primaryText="Pay with credit or debit card" />
       case 'transaction-form':
-      default: 
+      default:
         return <NavigationHeader primaryText="Pay with credit or debit card" />
     }
   }
@@ -145,10 +135,7 @@ export const KitCheckoutContent = ({ children }: KitCheckoutProvider) => {
                   backdropColor="backgroundBackdrop"
                   onClose={() => setOpenCheckoutModal(false)}
                 >
-                  <Box
-                    id="sequence-kit-checkout-content"
-                    className={sharedStyles.walletContent}
-                  >
+                  <Box id="sequence-kit-checkout-content" className={sharedStyles.walletContent}>
                     {getHeader()}
                     {getContent()}
                   </Box>
