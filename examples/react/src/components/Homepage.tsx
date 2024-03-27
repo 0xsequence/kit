@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import qs from 'query-string'
 import { useOpenConnectModal, signEthAuthProof, validateEthProof, useTheme as useKitTheme } from '@0xsequence/kit'
 import { useOpenWalletModal } from '@0xsequence/kit-wallet'
@@ -9,7 +9,9 @@ import {
   useWalletClient,
   usePublicClient,
   useChainId,
-  useSwitchChain
+  useSwitchChain,
+  useSendTransaction,
+  useWriteContract
 } from 'wagmi'
 import {
   Box,
@@ -21,12 +23,17 @@ import {
   MoonIcon,
   SignoutIcon,
   useTheme,
-  vars
+  vars,
+  Spinner,
+  useMediaQuery,
+  Switch
 } from '@0xsequence/design-system'
 
 import { Footer } from './Footer'
 import { messageToSign } from '../constants'
 import { formatAddress, getCheckoutSettings } from '../utils'
+import { sequence } from '0xsequence'
+import abi from '../constants/nft-abi'
 
 function Homepage() {
   const { theme, setTheme } = useTheme()
@@ -39,11 +46,29 @@ function Homepage() {
   const { data: walletClient } = useWalletClient()
   const { switchChain } = useSwitchChain()
 
+  const isMobile = useMediaQuery('isMobile')
+
+  const { data: txnData, sendTransaction, isLoading: isSendTxnLoading } = useSendTransaction()
+  const { data: txnData2, isLoading: isMintTxnLoading, writeContract } = useWriteContract()
+
+  const [isSigningMessage, setIsSigningMessage] = React.useState(false)
+  const [isMessageValid, setIsMessageValid] = React.useState<boolean | undefined>()
+  const [messageSig, setMessageSig] = React.useState<string | undefined>()
+
+  const [lastTxnDataHash, setLastTxnDataHash] = React.useState<string | undefined>()
+  const [lastTxnDataHash2, setLastTxnDataHash2] = React.useState<string | undefined>()
+
+  const [confirmationEnabled, setConfirmationEnabled] = React.useState<boolean>(
+    localStorage.getItem('confirmationEnabled') === 'true'
+  )
+
   const chainId = useChainId()
 
-  const publicClient = usePublicClient()
+  const networkForCurrentChainId = sequence.network.allNetworks.find(n => n.chainId === chainId)
 
-  // append ?debug=true to url to enable debug mode 
+  const publicClient = usePublicClient({ chainId })
+
+  // append ?debug=true to url to enable debug mode
   const { debug } = qs.parse(location.search)
   const isDebugMode = debug === 'true'
 
@@ -63,33 +88,76 @@ function Homepage() {
     }
   }
 
+  useEffect(() => {
+    if (txnData?.hash) {
+      setLastTxnDataHash(txnData.hash)
+    }
+    if (txnData2?.hash) {
+      setLastTxnDataHash2(txnData2.hash)
+    }
+  }, [txnData, txnData2])
+
   const signMessage = async () => {
     if (!walletClient) {
       return
     }
 
+    setIsSigningMessage(true)
+
     try {
       const message = messageToSign
-  
+
       // sign
       const sig = await walletClient.signMessage({
-        account: address || '' as `0x${string}`,
+        account: address || ('' as `0x${string}`),
         message
       })
+      console.log('address', address)
       console.log('signature:', sig)
+      console.log('chainId in homepage', chainId)
 
       const [account] = await walletClient.getAddresses()
-  
+
       const isValid = await publicClient.verifyMessage({
         address: account,
         message,
         signature: sig
       })
 
+      setIsSigningMessage(false)
+      setIsMessageValid(isValid)
+      setMessageSig(sig)
+
       console.log('isValid?', isValid)
     } catch (e) {
+      setIsSigningMessage(false)
       console.error(e)
     }
+  }
+
+  const runSendTransaction = async () => {
+    if (!walletClient) {
+      return
+    }
+
+    const [account] = await walletClient.getAddresses()
+
+    sendTransaction({ to: account, value: '0', gas: null })
+  }
+
+  const runMintNFT = async () => {
+    if (!walletClient) {
+      return
+    }
+
+    const [account] = await walletClient.getAddresses()
+
+    writeContract({
+      address: '0x0d402C63cAe0200F0723B3e6fa0914627a48462E',
+      abi,
+      functionName: 'awardItem',
+      args: [account, 'https://dev-metadata.sequence.app/projects/277/collections/62/tokens/0.json']
+    })
   }
 
   const onClickChangeTheme = () => {
@@ -98,7 +166,6 @@ function Homepage() {
     // Change the theme in kit. Theme can also be changed in the settings for kit only
     setKitTheme(theme === 'dark' ? 'light' : 'dark')
   }
-
 
   const HeaderContent = () => {
     if (!isConnected) {
@@ -114,13 +181,13 @@ function Homepage() {
     return (
       <Box padding="5" justifyContent="space-between">
         <Box flexDirection="row" alignItems="center" justifyContent="center" gap="3">
-          <Image style={{ width: '36px' }} src='kit-logo.svg' />
+          <Image style={{ width: '36px' }} src="kit-logo.svg" />
           <Image
             style={{
               width: '24px',
               filter: theme === 'dark' ? 'invert(0)' : 'invert(1)'
             }}
-            src='kit-logo-text.svg'
+            src="kit-logo-text.svg"
           />
         </Box>
         <Box>
@@ -129,38 +196,46 @@ function Homepage() {
               <Box style={{ marginRight: '-12px' }}>
                 <SwitchThemeButton />
               </Box>
-              <Text fontWeight="medium" fontSize="normal" color="text100">{formatAddress(address || '')}</Text>
+              <Text fontWeight="medium" fontSize="normal" color="text100">
+                {isMobile ? formatAddress(address || '') : address}
+              </Text>
             </Box>
             <Box alignItems="center" justifyContent="flex-end" flexDirection="row">
               <Text fontWeight="medium" fontSize="normal" color="text50">
                 {connector?.name}
               </Text>
             </Box>
-          </Box>          
+          </Box>
         </Box>
       </Box>
     )
   }
 
   interface ClickableCardProps {
-    title: string,
-    description: string,
+    title: string
+    description: string
+    disabled?: boolean
+    isLoading?: boolean
     onClick: () => void
   }
 
-  const ClickableCard = ({
-    title, description, onClick
-  }: ClickableCardProps) => {
+  const ClickableCard = ({ title, description, disabled, isLoading, onClick }: ClickableCardProps) => {
     return (
-      <Card style={{ width: '332px' }} clickable onClick={onClick}>
+      <Card
+        style={{ width: '332px' }}
+        clickable={!disabled}
+        onClick={disabled ? () => {} : onClick}
+        opacity={disabled ? '50' : '100'}
+      >
         <Text color="text100" lineHeight="5" fontSize="normal" fontWeight="bold">
           {title}
         </Text>
         <Box marginTop="1">
-          <Text fontWeight="medium" lineHeight="5" color="text50" fontSize="normal" >
+          <Text fontWeight="medium" lineHeight="5" color="text50" fontSize="normal">
             {description}
           </Text>
         </Box>
+        {isLoading && <Spinner marginTop="3" size="sm" color="text100" />}
       </Card>
     )
   }
@@ -175,16 +250,23 @@ function Homepage() {
 
   const SwitchThemeButton = () => {
     return (
-      <Button variant="base" style={{ color: vars.colors.text100 }} onClick={onClickChangeTheme} leftIcon={theme === 'dark' ? SunIcon : MoonIcon} />
+      <Button
+        variant="base"
+        style={{ color: vars.colors.text100 }}
+        onClick={onClickChangeTheme}
+        leftIcon={theme === 'dark' ? SunIcon : MoonIcon}
+      />
     )
   }
 
   const onSwitchNetwork = () => {
-    if (chainId === 1) {
-      switchChain({ chainId: 137 })
+    if (chainId === 421614) {
+      switchChain({ chainId: 42170 })
     } else {
-      switchChain({ chainId: 1 })
+      switchChain({ chainId: 421614 })
     }
+
+    setIsMessageValid(undefined)
   }
 
   return (
@@ -197,26 +279,88 @@ function Homepage() {
       <Box style={{ height: '72px' }} position="fixed" width="full" top="0">
         <HeaderContent />
       </Box>
-      <Box style={{  height: '100vh'}} flexDirection="column" justifyContent="center" alignItems="center">
+      <Box
+        style={isMobile ? { paddingTop: '85px', paddingBottom: '80px' } : { height: '100vh' }}
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+      >
         {isConnected ? (
           <Box flexDirection="column" gap="4">
             <Box flexDirection="column" gap="2">
-              <Text color="text50" fontSize="small" fontWeight="medium">Demos</Text>
+              <Text color="text50" fontSize="small" fontWeight="medium">
+                Demos
+              </Text>
               <ClickableCard
                 title="Embedded wallet"
                 description="Connect a Sequence wallet to view, swap, send, and receive collections"
                 onClick={() => setOpenWalletModal(true)}
               />
-              <ClickableCard
+              {/* <ClickableCard
                 title="Checkout"
                 description="Checkout screen before placing a purchase on coins or collections"
                 onClick={onClickCheckout}
+              /> */}
+              <ClickableCard
+                title="Send transaction"
+                description="Send a transaction with your wallet"
+                isLoading={isSendTxnLoading}
+                onClick={runSendTransaction}
               />
+
+              {lastTxnDataHash && txnData?.chainId === chainId && (
+                <Text
+                  as="a"
+                  marginLeft="4"
+                  variant="small"
+                  underline
+                  href={`${networkForCurrentChainId.blockExplorer.rootUrl}/tx/${txnData.hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View on {networkForCurrentChainId.blockExplorer.name}
+                </Text>
+              )}
               <ClickableCard
                 title="Sign message"
                 description="Sign a message with your wallet"
                 onClick={signMessage}
+                isLoading={isSigningMessage}
               />
+              {isMessageValid && (
+                <Card style={{ width: '332px' }} flexDirection={'column'} gap={'2'}>
+                  <Text variant="medium">Signed message:</Text>
+                  <Text>{messageToSign}</Text>
+                  <Text variant="medium">Signature:</Text>
+                  <Text variant="code" as="p" ellipsis>
+                    {messageSig}
+                  </Text>
+                  <Text variant="medium">
+                    isValid: <Text variant="code">{isMessageValid.toString()}</Text>
+                  </Text>
+                </Card>
+              )}
+
+              <ClickableCard
+                title="Mint an NFT"
+                description="Test minting an NFT to your wallet"
+                isLoading={isMintTxnLoading}
+                onClick={runMintNFT}
+              />
+              {lastTxnDataHash2 && txnData2?.chainId === chainId && (
+                <Text
+                  as="a"
+                  marginLeft="4"
+                  variant="small"
+                  underline
+                  href={`${networkForCurrentChainId.blockExplorer.rootUrl}/tx/${txnData2.hash}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  View on {networkForCurrentChainId.blockExplorer.name}
+                </Text>
+              )}
+
               {isDebugMode && (
                 <ClickableCard
                   title="Generate EthAuth proof"
@@ -224,29 +368,65 @@ function Homepage() {
                   onClick={generateEthAuthProof}
                 />
               )}
-              {isDebugMode && (
-                <ClickableCard
-                  title="Switch network"
-                  description="Switch network"
-                  onClick={onSwitchNetwork}
-                />
-              )}
+              <ClickableCard
+                title="Switch network"
+                description={`Current network: ${networkForCurrentChainId.title}`}
+                onClick={onSwitchNetwork}
+              />
             </Box>
-            <Box width="full" gap="2" flexDirection="row" justifyContent="flex-end" >
-              <Button onClick={() => disconnect()} leftIcon={SignoutIcon} label="Sign out" />
+
+            <Box marginY="3">
+              <Box as="label" flexDirection="row" alignItems="center" justifyContent="space-between">
+                <Text fontWeight="semibold" variant="small" color="text50">
+                  Confirmations
+                </Text>
+
+                <Box alignItems="center" gap="2">
+                  <Switch
+                    name="confirmations"
+                    checked={confirmationEnabled}
+                    onCheckedChange={async (checked: boolean) => {
+                      if (checked) {
+                        localStorage.setItem('confirmationEnabled', 'true')
+                        setConfirmationEnabled(true)
+                      } else {
+                        localStorage.removeItem('confirmationEnabled')
+                        setConfirmationEnabled(false)
+                      }
+
+                      await delay(300)
+
+                      window.location.reload()
+                    }}
+                  />
+                </Box>
+              </Box>
+            </Box>
+            <Box width="full" gap="2" flexDirection="row" justifyContent="flex-end">
+              <Button
+                onClick={() => {
+                  disconnect()
+                  setLastTxnDataHash(undefined)
+                  setLastTxnDataHash2(undefined)
+                  setIsMessageValid(undefined)
+                }}
+                leftIcon={SignoutIcon}
+                label="Sign out"
+              />
             </Box>
           </Box>
-      ) : (
+        ) : (
           <Box>
             <Box flexDirection="column" alignItems="center" justifyContent="center" gap="5">
               <Box flexDirection="row" alignItems="center" justifyContent="center" gap="3">
-                <Image style={{ width: '48px' }} src='kit-logo.svg' />
+                <Image style={{ width: '48px' }} src="kit-logo.svg" />
                 <Image
                   style={{
                     width: '32px',
                     filter: theme === 'dark' ? 'invert(0)' : 'invert(1)'
                   }}
-                  src='kit-logo-text.svg' />
+                  src="kit-logo-text.svg"
+                />
               </Box>
               <Box gap="2" flexDirection="row" alignItems="center">
                 <Button onClick={onClickConnect} variant="feature" label="Connect" />
@@ -255,9 +435,13 @@ function Homepage() {
           </Box>
         )}
       </Box>
-      <Footer />
+      {!isMobile && <Footer />}
     </Box>
-  );
+  )
 }
 
-export default Homepage;
+function delay(ms: number) {
+  return new Promise(resolve => setTimeout(resolve, ms))
+}
+
+export default Homepage
