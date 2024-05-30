@@ -9,6 +9,7 @@ import { emailWaas } from './connectors/email/emailWaas'
 import { facebook } from './connectors/facebook'
 import { google } from './connectors/google'
 import { googleWaas } from './connectors/google/googleWaas'
+import { immutable } from './connectors/immutable'
 import { metamask } from './connectors/metamask'
 import { sequence } from './connectors/sequence'
 import { twitch } from './connectors/twitch'
@@ -28,6 +29,7 @@ export const getDefaultConnectors = ({
   appName
 }: GetDefaultConnectors): CreateConnectorFn[] => {
   const connectors = getKitConnectWallets(projectAccessKey, [
+    immutable({}),
     email({
       defaultNetwork: defaultChainId,
       connect: {
