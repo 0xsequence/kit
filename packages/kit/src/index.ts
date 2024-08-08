@@ -1,3 +1,5 @@
+export { SequenceKit } from './components/SequenceKit'
+
 // Provider
 export { KitProvider } from './components/KitProvider'
 
@@ -16,6 +18,7 @@ export type {
 } from './types'
 
 // Config
+export { getDefaultConfig } from './config/defaultConfig'
 export { getDefaultConnectors, getDefaultWaasConnectors } from './config/defaultConnectors'
 export { getDefaultChains } from './config/defaultChains'
 
