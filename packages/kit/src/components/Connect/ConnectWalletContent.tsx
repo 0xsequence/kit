@@ -10,6 +10,8 @@ import { Connect } from './Connect'
 interface ConnectWalletContent extends KitConnectProviderProps {
   emailConflictInfo?: FormattedEmailConflictInfo | null
   onClose: () => void
+  googleUseRedirectMode?: boolean
+  googleRedirectModeLoginUri?: string
 }
 
 export const ConnectWalletContent = (props: ConnectWalletContent) => {
