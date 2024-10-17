@@ -4,7 +4,7 @@ import { createGenericContext } from './genericContext'
 
 export type CreditCardProviders = 'sardine' | 'transak'
 
-interface Collectible {
+export interface Collectible {
   tokenId: string
   quantity: string
   decimals?: string
@@ -25,6 +25,7 @@ export interface SelectPaymentSettings {
   onError?: (error: Error) => void
   enableMainCurrencyPayment?: boolean
   enableSwapPayments?: boolean
+  enableTransferFunds?: boolean
   creditCardProviders?: string[]
 }
 

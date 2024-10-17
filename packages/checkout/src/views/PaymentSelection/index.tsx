@@ -8,10 +8,11 @@ import { useSelectPaymentModal } from '../../hooks'
 import { NavigationHeader } from '../../shared/components/NavigationHeader'
 
 import { Footer } from './Footer'
-import { ItemDescription } from './ItemDescription'
+import { OrderSummary } from './OrderSummary'
 import { PayWithCreditCard } from './PayWithCreditCard'
 import { PayWithCrypto } from './PayWithCrypto/index'
-import { Price } from './Price'
+import { TransferFunds } from './TransferFunds'
+import { CryptoOption } from './PayWithCrypto/CryptoOption'
 
 export const PaymentSelection = () => {
   return (
@@ -26,8 +27,6 @@ export const PaymentSelectionHeader = () => {
   return <NavigationHeader primaryText="Checkout" />
 }
 
-type Tabs = 'crypto' | 'credit_card'
-
 export const PaymentSelectionContent = () => {
   const { selectPaymentSettings } = useSelectPaymentModal()
 
@@ -39,45 +38,11 @@ export const PaymentSelectionContent = () => {
 
   const isNativeToken = compareAddress(selectPaymentSettings.currencyAddress, zeroAddress)
 
+  const enableTransferFunds = selectPaymentSettings.enableTransferFunds ?? true
   const enableMainCurrencyPayment = selectPaymentSettings.enableMainCurrencyPayment ?? true
   // Swap payments with native tokens are disabled due to lack of testing
   const enableSwapPayments = !isNativeToken && (selectPaymentSettings.enableSwapPayments ?? true)
   const creditCardProviders = selectPaymentSettings.creditCardProviders ?? []
-
-  const tabs = [
-    ...(enableMainCurrencyPayment || enableSwapPayments
-      ? [
-          {
-            label: (
-              <Box gap="1" alignItems="center" justifyContent="center">
-                <WalletIcon />
-                Crypto
-              </Box>
-            ),
-            value: 'crypto'
-          }
-        ]
-      : []),
-    ...(creditCardProviders.length > 0
-      ? [
-          {
-            label: (
-              <Box gap="1" alignItems="center" justifyContent="center">
-                <PaymentsIcon />
-                Credit card
-              </Box>
-            ),
-            value: 'credit_card'
-          }
-        ]
-      : [])
-  ]
-
-  const isOneTab = tabs.length === 1
-
-  const defaultTab: Tabs = (tabs[0]?.value as Tabs) || 'crypto'
-
-  const [selectedTab, setSelectedTab] = useState<Tabs>(defaultTab)
 
   return (
     <Box
@@ -86,39 +51,31 @@ export const PaymentSelectionContent = () => {
       alignItems="flex-start"
       width="full"
       paddingBottom="4"
+      paddingX="6"
       height="full"
       style={{ height: PAYMENT_SELECTION_MODAL_HEIGHT, paddingTop: HEADER_HEIGHT }}
     >
       <Box flexDirection="column" width="full" gap="2">
-        {selectPaymentSettings.collectibles.map(collectible => {
-          return <ItemDescription key={collectible.tokenId} tokenId={collectible.tokenId} nftQuantity={collectible.quantity} />
-        })}
+        <OrderSummary />
       </Box>
-      <Divider width="full" color="backgroundSecondary" marginY="1" />
-      <Price />
-      <Divider width="full" color="backgroundSecondary" marginY="1" />
-      <Box marginY="2" width="full" paddingX="6" gap="3" flexDirection="column">
-        <Text display={isOneTab ? 'none' : 'block'} variant="small" color="text50">
-          Select a payment method
-        </Text>
-        <TabsRoot value={selectedTab} onValueChange={value => setSelectedTab(value as Tabs)}>
-          {!isOneTab && <TabsHeader value={selectedTab} tabs={tabs} />}
-          {(enableMainCurrencyPayment || enableSwapPayments) && (
-            <TabsContent value="crypto">
-              <PayWithCrypto
-                settings={selectPaymentSettings}
-                disableButtons={disableButtons}
-                setDisableButtons={setDisableButtons}
-              />
-            </TabsContent>
-          )}
-          {creditCardProviders.length > 0 && (
-            <TabsContent value="credit_card">
-              <PayWithCreditCard settings={selectPaymentSettings} disableButtons={disableButtons} />
-            </TabsContent>
-          )}
-        </TabsRoot>
-      </Box>
+      {(enableMainCurrencyPayment || enableSwapPayments) && (
+        <>
+          <Divider width="full" color="backgroundSecondary" marginY="3" />
+          <PayWithCrypto settings={selectPaymentSettings} disableButtons={disableButtons} setDisableButtons={setDisableButtons} />
+        </>
+      )}
+      {creditCardProviders.length > 0 && (
+        <>
+          <Divider width="full" color="backgroundSecondary" marginY="3" />
+          <PayWithCreditCard settings={selectPaymentSettings} disableButtons={disableButtons} />
+        </>
+      )}
+      {enableTransferFunds && (
+        <>
+          <Divider width="full" color="backgroundSecondary" marginY="3" />
+          <TransferFunds />
+        </>
+      )}
       <Footer />
     </Box>
   )
