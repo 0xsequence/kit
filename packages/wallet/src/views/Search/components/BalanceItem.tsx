@@ -23,7 +23,7 @@ export const BalanceItem = ({ balance }: BalanceItemProps) => {
 
   const getQuantity = () => {
     if (balance.contractType === 'ERC721' || balance.contractType === 'ERC1155') {
-      return balance.balance
+      return balance.uniqueCollectibles
     }
     const decimals = isNativeToken ? nativeTokenInfo.decimals : balance?.contractInfo?.decimals
     const bal = ethers.formatUnits(balance.balance, decimals || 0)
