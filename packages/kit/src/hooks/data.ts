@@ -135,7 +135,7 @@ export const useCoinBalance = (args: UseCoinBalanceArgs) => {
   return useQuery({
     queryKey: ['coinBalance', args],
     queryFn: async () => {
-      if (compareAddress(args?.filter.accountAddresses[0] || '', zeroAddress)) {
+      if (compareAddress(args?.filter.contractWhitelist[0] || '', zeroAddress)) {
         const res = await getNativeTokenBalance(indexerClient, args.chainId, args.filter.accountAddresses[0] || '')
         return res
       } else {
