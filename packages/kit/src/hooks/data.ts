@@ -26,7 +26,6 @@ export const time = {
 }
 
 export const getNativeTokenBalance = async (indexerClient: SequenceIndexer, chainId: number, accountAddress: string) => {
-  // ATTENTION: switch to new api
   const res = await indexerClient.getNativeTokenBalance({ accountAddress })
 
   const tokenBalance: TokenBalance = {
@@ -82,7 +81,6 @@ export const getTokenBalancesByContract = async (indexerClient: SequenceIndexer,
 }
 
 export const getBalances = async (indexerClient: SequenceIndexer, chainId: number, args: GetTokenBalancesSummaryArgs) => {
-  // ATTENTION: switch to new api
   if (!args.filter.accountAddresses[0]) {
     return []
   }
@@ -129,7 +127,6 @@ interface UseCoinBalanceArgs extends GetTokenBalancesSummaryArgs {
 }
 
 export const useCoinBalance = (args: UseCoinBalanceArgs) => {
-  // ATTENTION: switch to new api
   const indexerClient = useIndexerClient(args.chainId)
 
   return useQuery({
@@ -155,7 +152,6 @@ interface UseCollectibleBalanceArgs extends GetTokenBalancesDetailsArgs {
 }
 
 export const useCollectibleBalance = (args: UseCollectibleBalanceArgs) => {
-  // ATTENTION: switch to new api
   const indexerClient = useIndexerClient(args.chainId)
 
   return useQuery({
@@ -443,7 +439,6 @@ const getSwapPrices = async (
       const currencyAddress = compareAddress(rawCurrencyAddress, NATIVE_TOKEN_ADDRESS_0X) ? zeroAddress : rawCurrencyAddress
       const isNativeToken = compareAddress(currencyAddress, zeroAddress)
 
-      // ATTENTION: switch to new api
       if (currencyAddress && !currencyBalanceInfoMap.has(currencyAddress)) {
         currencyBalanceInfoMap.set(
           currencyAddress,

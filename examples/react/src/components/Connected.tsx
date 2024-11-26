@@ -134,10 +134,8 @@ export const Connected = () => {
   const checkTokenBalancesForFeeOptions = async () => {
     if (pendingFeeOptionConfirmation && walletClient) {
       const [account] = await walletClient.getAddresses()
-      // ATTENTION: switch to new api
       const nativeTokenBalance = await indexerClient.getNativeTokenBalance({ accountAddress: account })
 
-      // ATTENTION: switch to new api
       const tokenBalances = await indexerClient.getTokenBalancesSummary({
         filter: {
           accountAddresses: [account],
