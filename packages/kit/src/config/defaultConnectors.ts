@@ -44,6 +44,8 @@ export interface DefaultWaasConnectorOptions extends CommonConnectorOptions {
     | {
         projectId: string
       }
+  additionalWallets?: Wallet[]
+
 
   /**
    * @deprecated use connectors.walletConnect.projectId instead
@@ -78,11 +80,11 @@ export interface DefaultUniversalConnectorOptions extends CommonConnectorOptions
     | {
         projectId: string
       }
-
   /**
    * @deprecated, use connectors.walletConnect.projectId instead
    */
   walletConnectProjectId?: string
+  additionalWallets?: Wallet[]
 }
 
 export type DefaultConnectorOptions<T extends WalletType> = T extends 'waas'
@@ -162,6 +164,11 @@ export const getDefaultWaasConnectors = (options: DefaultWaasConnectorOptions): 
         projectId
       })
     )
+  }
+
+
+  if (options?.additionalWallets && options?.additionalWallets.length > 0) {
+    wallets.push(...options.additionalWallets)
   }
 
   return getKitConnectWallets(projectAccessKey, wallets)
@@ -246,6 +253,10 @@ export const getDefaultUniversalConnectors = (options: DefaultUniversalConnector
         projectId
       })
     )
+  }
+
+  if (options?.additionalWallets && options?.additionalWallets.length > 0) {
+    wallets.push(...options.additionalWallets)
   }
 
   return getKitConnectWallets(projectAccessKey, wallets)
