@@ -7,7 +7,13 @@ import {
   validateEthProof,
   getModalPositionCss
 } from '@0xsequence/kit'
-import { useCheckoutModal, useAddFundsModal, useERC1155SaleContractPaymentModal, useSwapModal } from '@0xsequence/kit-checkout'
+import {
+  useCheckoutModal,
+  useAddFundsModal,
+  useERC1155SaleContractPaymentModal,
+  useSwapModal,
+  useERC1155SaleContractCheckout
+} from '@0xsequence/kit-checkout'
 import type { SwapModalSettings } from '@0xsequence/kit-checkout'
 import { CardButton, Header } from '@0xsequence/kit-example-shared-components'
 import { useOpenWalletModal } from '@0xsequence/kit-wallet'
@@ -26,7 +32,7 @@ import {
   useWriteContract
 } from 'wagmi'
 
-import { sponsoredContractAddresses } from '../config'
+import { sponsoredContractAddresses, getErc1155SaleContractConfig } from '../config'
 import { messageToSign } from '../constants'
 import { abi } from '../constants/nft-abi'
 import { delay, getCheckoutSettings, getOrderbookCalldata } from '../utils'
@@ -42,6 +48,9 @@ export const Connected = () => {
   const { triggerCheckout } = useCheckoutModal()
   const { triggerAddFunds } = useAddFundsModal()
   const { openERC1155SaleContractPaymentModal } = useERC1155SaleContractPaymentModal()
+  const { openCheckoutModal, isLoading: isLoadingCheckoutModal } = useERC1155SaleContractCheckout(
+    getErc1155SaleContractConfig(address || '')
+  )
   const { data: walletClient } = useWalletClient()
   const storage = useStorage()
 
@@ -331,36 +340,37 @@ export const Connected = () => {
     // const price = '200000000000000'
 
     // // ERC-20 contract
-    const currencyAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359'
-    const salesContractAddress = '0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b'
-    const collectionAddress = '0xdeb398f41ccd290ee5114df7e498cf04fac916cb'
-    const price = '20000'
+    // const currencyAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359'
+    // const salesContractAddress = '0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b'
+    // const collectionAddress = '0xdeb398f41ccd290ee5114df7e498cf04fac916cb'
+    // const price = '20000'
 
-    const chainId = 137
+    // const chainId = 137
 
-    openERC1155SaleContractPaymentModal({
-      collectibles: [
-        {
-          tokenId: '1',
-          quantity: '1'
-        }
-      ],
-      chain: chainId,
-      price,
-      targetContractAddress: salesContractAddress,
-      recipientAddress: address,
-      currencyAddress,
-      collectionAddress,
-      creditCardProviders: ['sardine'],
-      isDev: true,
-      copyrightText: 'ⓒ2024 Sequence',
-      onSuccess: (txnHash: string) => {
-        console.log('success!', txnHash)
-      },
-      onError: (error: Error) => {
-        console.error(error)
-      }
-    })
+    // openERC1155SaleContractPaymentModal({
+    //   collectibles: [
+    //     {
+    //       tokenId: '1',
+    //       quantity: '1'
+    //     }
+    //   ],
+    //   chain: chainId,
+    //   price,
+    //   targetContractAddress: salesContractAddress,
+    //   recipientAddress: address,
+    //   currencyAddress,
+    //   collectionAddress,
+    //   creditCardProviders: ['sardine'],
+    //   isDev: true,
+    //   copyrightText: 'ⓒ2024 Sequence',
+    //   onSuccess: (txnHash: string) => {
+    //     console.log('success!', txnHash)
+    //   },
+    //   onError: (error: Error) => {
+    //     console.error(error)
+    //   }
+    // })
+    openCheckoutModal()
   }
 
   const onCheckoutInfoConfirm = () => {
@@ -543,6 +553,7 @@ export const Connected = () => {
               title="Checkout with Sequence Pay"
               description="Purchase an NFT through various purchase methods"
               onClick={onClickSelectPayment}
+              isPending={isLoadingCheckoutModal}
             />
           </Box>
 
