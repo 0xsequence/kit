@@ -47,10 +47,8 @@ export const Connected = () => {
   const { setOpenWalletModal } = useOpenWalletModal()
   const { triggerCheckout } = useCheckoutModal()
   const { triggerAddFunds } = useAddFundsModal()
-  const { openERC1155SaleContractPaymentModal } = useERC1155SaleContractPaymentModal()
-  const { openCheckoutModal, isLoading: isLoadingCheckoutModal } = useERC1155SaleContractCheckout(
-    getErc1155SaleContractConfig(address || '')
-  )
+  // const { openERC1155SaleContractPaymentModal } = useERC1155SaleContractPaymentModal()
+  const { openCheckoutModal } = useERC1155SaleContractCheckout(getErc1155SaleContractConfig(address || ''))
   const { data: walletClient } = useWalletClient()
   const storage = useStorage()
 
@@ -340,12 +338,12 @@ export const Connected = () => {
     // const price = '200000000000000'
 
     // // ERC-20 contract
-    // const currencyAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359'
-    // const salesContractAddress = '0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b'
-    // const collectionAddress = '0xdeb398f41ccd290ee5114df7e498cf04fac916cb'
-    // const price = '20000'
+    const currencyAddress = '0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359'
+    const salesContractAddress = '0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b'
+    const collectionAddress = '0xdeb398f41ccd290ee5114df7e498cf04fac916cb'
+    const price = '20000'
 
-    // const chainId = 137
+    const chainId = 137
 
     // openERC1155SaleContractPaymentModal({
     //   collectibles: [
@@ -553,7 +551,6 @@ export const Connected = () => {
               title="Checkout with Sequence Pay"
               description="Purchase an NFT through various purchase methods"
               onClick={onClickSelectPayment}
-              isPending={isLoadingCheckoutModal}
             />
           </Box>
 
