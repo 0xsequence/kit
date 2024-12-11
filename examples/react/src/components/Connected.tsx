@@ -7,7 +7,13 @@ import {
   validateEthProof,
   getModalPositionCss
 } from '@0xsequence/kit'
-import { useCheckoutModal, useAddFundsModal, useERC1155SaleContractPaymentModal, useSwapModal } from '@0xsequence/kit-checkout'
+import {
+  useCheckoutModal,
+  useAddFundsModal,
+  useERC1155SaleContractPaymentModal,
+  useSwapModal,
+  useERC1155SaleContractCheckout
+} from '@0xsequence/kit-checkout'
 import type { SwapModalSettings } from '@0xsequence/kit-checkout'
 import { CardButton, Header } from '@0xsequence/kit-example-shared-components'
 import { useOpenWalletModal } from '@0xsequence/kit-wallet'
@@ -26,7 +32,7 @@ import {
   useWriteContract
 } from 'wagmi'
 
-import { sponsoredContractAddresses } from '../config'
+import { sponsoredContractAddresses, getErc1155SaleContractConfig } from '../config'
 import { messageToSign } from '../constants'
 import { abi } from '../constants/nft-abi'
 import { delay, getCheckoutSettings, getOrderbookCalldata } from '../utils'
@@ -41,7 +47,8 @@ export const Connected = () => {
   const { setOpenWalletModal } = useOpenWalletModal()
   const { triggerCheckout } = useCheckoutModal()
   const { triggerAddFunds } = useAddFundsModal()
-  const { openERC1155SaleContractPaymentModal } = useERC1155SaleContractPaymentModal()
+  // const { openERC1155SaleContractPaymentModal } = useERC1155SaleContractPaymentModal()
+  const { openCheckoutModal } = useERC1155SaleContractCheckout(getErc1155SaleContractConfig(address || ''))
   const { data: walletClient } = useWalletClient()
   const storage = useStorage()
 
@@ -338,29 +345,30 @@ export const Connected = () => {
 
     const chainId = 137
 
-    openERC1155SaleContractPaymentModal({
-      collectibles: [
-        {
-          tokenId: '1',
-          quantity: '1'
-        }
-      ],
-      chain: chainId,
-      price,
-      targetContractAddress: salesContractAddress,
-      recipientAddress: address,
-      currencyAddress,
-      collectionAddress,
-      creditCardProviders: ['sardine'],
-      isDev: true,
-      copyrightText: 'ⓒ2024 Sequence',
-      onSuccess: (txnHash: string) => {
-        console.log('success!', txnHash)
-      },
-      onError: (error: Error) => {
-        console.error(error)
-      }
-    })
+    // openERC1155SaleContractPaymentModal({
+    //   collectibles: [
+    //     {
+    //       tokenId: '1',
+    //       quantity: '1'
+    //     }
+    //   ],
+    //   chain: chainId,
+    //   price,
+    //   targetContractAddress: salesContractAddress,
+    //   recipientAddress: address,
+    //   currencyAddress,
+    //   collectionAddress,
+    //   creditCardProviders: ['sardine'],
+    //   isDev: true,
+    //   copyrightText: 'ⓒ2024 Sequence',
+    //   onSuccess: (txnHash: string) => {
+    //     console.log('success!', txnHash)
+    //   },
+    //   onError: (error: Error) => {
+    //     console.error(error)
+    //   }
+    // })
+    openCheckoutModal()
   }
 
   const onCheckoutInfoConfirm = () => {

@@ -237,7 +237,10 @@ importers:
         version: 2.1.4
       '@0xsequence/indexer':
         specifier: '>= 2.1.4'
-        version: 2.1.4
+        version: 2.1.8
+      '@0xsequence/marketplace':
+        specifier: ^2.1.3
+        version: 2.1.3
       '@0xsequence/metadata':
         specifier: '>= 2.1.4'
         version: 2.1.4
@@ -310,7 +313,7 @@ importers:
         version: 1.0.0(ethers@6.13.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))
       '@0xsequence/indexer':
         specifier: ^2.1.4
-        version: 2.1.4
+        version: 2.1.8
       '@0xsequence/metadata':
         specifier: ^2.1.4
         version: 2.1.4
@@ -371,7 +374,7 @@ importers:
         version: 2.1.4
       '@0xsequence/indexer':
         specifier: '>= 2.1.4'
-        version: 2.1.4
+        version: 2.1.8
       '@0xsequence/metadata':
         specifier: '>= 2.1.4'
         version: 2.1.4
@@ -483,6 +486,12 @@ packages:
 
   '@0xsequence/indexer@2.1.4':
     resolution: {integrity: sha512-zm41xPiPOHlbRaJln9qI/DZwZglRuwnPW7gPwKYOCuw5kd8WYdB9oUZeU3LdOBYww1pcteeWgl0A1qUs/NHrgA==}
+
+  '@0xsequence/indexer@2.1.8':
+    resolution: {integrity: sha512-CnSYUCIeA8pSlJ51q3rvW010YqqggI+HiVoCfUfgdgDqlWqLbTlwJO/v4K1rRhPP/EjeWpFuTw2JDouZcQULuQ==}
+
+  '@0xsequence/marketplace@2.1.3':
+    resolution: {integrity: sha512-SHjAGxjHmIy10kshXk0xbyzzqa91VoiKkpDY6EjWP7q0vimbjfKYYZTKr80+X1kcMbAHFGtaEmdSQvg/vrN/mA==}
 
   '@0xsequence/metadata@2.1.4':
     resolution: {integrity: sha512-OLL1iHw2Z+OMiDRY6Czw5L1y2LcP8rhkG16t/xhvPvZeNueciYs/Q0//LCgZb16MB2P207daBWfW7T2R6LVq+A==}
@@ -7200,6 +7209,10 @@ snapshots:
 
   '@0xsequence/indexer@2.1.4': {}
 
+  '@0xsequence/indexer@2.1.8': {}
+
+  '@0xsequence/marketplace@2.1.3': {}
+
   '@0xsequence/metadata@2.1.4': {}
 
   '@0xsequence/migration@2.1.4(ethers@6.13.0(bufferutil@4.0.8)(utf-8-validate@5.0.10))':
@@ -8760,7 +8773,7 @@ snapshots:
       eth-json-rpc-filters: 6.0.1
       eventemitter3: 5.0.1
       keccak: 3.0.4
-      preact: 10.24.0
+      preact: 10.25.1
       sha.js: 2.4.11
     transitivePeerDependencies:
       - supports-color
@@ -13986,7 +13999,7 @@ snapshots:
 
   metro-runtime@0.80.12:
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.0
       flow-enums-runtime: 0.0.6
 
   metro-source-map@0.80.12:
@@ -14891,7 +14904,7 @@ snapshots:
 
   regenerator-transform@0.15.2:
     dependencies:
-      '@babel/runtime': 7.25.6
+      '@babel/runtime': 7.26.0
 
   regexp.prototype.flags@1.5.2:
     dependencies:
