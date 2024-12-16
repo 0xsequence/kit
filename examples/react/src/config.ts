@@ -58,7 +58,13 @@ export const config =
     ? createConfig('waas', {
         ...kitConfig,
         appName: 'Kit Demo',
-        chainIds: [ChainId.ARBITRUM_NOVA, ChainId.ARBITRUM_SEPOLIA, ChainId.POLYGON],
+        chainIds: [
+          ChainId.ARBITRUM_NOVA,
+          ChainId.ARBITRUM_SEPOLIA,
+          ChainId.POLYGON,
+          ChainId.IMMUTABLE_ZKEVM,
+          ChainId.IMMUTABLE_ZKEVM_TESTNET
+        ],
         defaultChainId: ChainId.ARBITRUM_NOVA,
         waasConfigKey: isDebugMode
           ? 'eyJwcm9qZWN0SWQiOjY5NCwicnBjU2VydmVyIjoiaHR0cHM6Ly9kZXYtd2Fhcy5zZXF1ZW5jZS5hcHAiLCJlbWFpbFJlZ2lvbiI6ImNhLWNlbnRyYWwtMSIsImVtYWlsQ2xpZW50SWQiOiI1NGF0bjV1cGk2M3FjNTlhMWVtM3ZiaHJzbiJ9'
@@ -81,10 +87,33 @@ export const config =
     : createConfig('universal', {
         ...kitConfig,
         appName: 'Kit Demo',
-        chainIds: [ChainId.ARBITRUM_NOVA, ChainId.ARBITRUM_SEPOLIA, ChainId.POLYGON],
+        chainIds: [
+          ChainId.ARBITRUM_NOVA,
+          ChainId.ARBITRUM_SEPOLIA,
+          ChainId.POLYGON,
+          ChainId.IMMUTABLE_ZKEVM,
+          ChainId.IMMUTABLE_ZKEVM_TESTNET
+        ],
         defaultChainId: ChainId.ARBITRUM_NOVA,
 
         walletConnect: {
           projectId: walletConnectProjectId
         }
       })
+
+export const getErc1155SaleContractConfig = (walletAddress: string) => ({
+  chain: 137,
+  // ERC20 token sale
+  contractAddress: '0xe65b75eb7c58ffc0bf0e671d64d0e1c6cd0d3e5b',
+  collectionAddress: '0xdeb398f41ccd290ee5114df7e498cf04fac916cb',
+  // Native token sale
+  // contractAddress: '0xf0056139095224f4eec53c578ab4de1e227b9597',
+  // collectionAddress: '0x92473261f2c26f2264429c451f70b0192f858795',
+  wallet: walletAddress,
+  items: [{
+    tokenId: '1',
+    quantity: '1'
+  }],
+  onSuccess: () => { console.log('success') },
+  isDev: isDebugMode
+})

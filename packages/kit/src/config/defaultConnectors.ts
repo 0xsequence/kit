@@ -8,6 +8,7 @@ import { emailWaas } from '../connectors/email/emailWaas'
 import { facebook } from '../connectors/facebook'
 import { google } from '../connectors/google'
 import { googleWaas } from '../connectors/google/googleWaas'
+import { metaMask } from '../connectors/metaMask'
 import { sequence } from '../connectors/sequence'
 import { twitch } from '../connectors/twitch'
 import { walletConnect } from '../connectors/walletConnect'
@@ -39,6 +40,7 @@ export interface DefaultWaasConnectorOptions extends CommonConnectorOptions {
         redirectURI: string
       }
   coinbase?: boolean
+  metaMask?: boolean
   walletConnect?:
     | false
     | {
@@ -73,6 +75,8 @@ export interface DefaultUniversalConnectorOptions extends CommonConnectorOptions
   facebook?: boolean
   twitch?: boolean
   apple?: boolean
+  coinbase?: boolean
+  metaMask?: boolean
   walletConnect?:
     | false
     | {
@@ -146,6 +150,20 @@ export const getDefaultWaasConnectors = (options: DefaultWaasConnectorOptions): 
     )
   }
 
+  if (options.metaMask !== false) {
+    if (typeof window !== 'undefined') {
+      wallets.push(
+        metaMask({
+          dappMetadata: {
+            name: appName,
+            url: window.location.origin,
+            iconUrl: `https://www.google.com/s2/favicons?domain_url=${window.location.origin}`
+          }
+        })
+      )
+    }
+  }
+
   if (options.coinbase !== false) {
     wallets.push(
       coinbaseWallet({
@@ -159,7 +177,8 @@ export const getDefaultWaasConnectors = (options: DefaultWaasConnectorOptions): 
 
     wallets.push(
       walletConnect({
-        projectId
+        projectId,
+        defaultNetwork: defaultChainId
       })
     )
   }
@@ -238,12 +257,35 @@ export const getDefaultUniversalConnectors = (options: DefaultUniversalConnector
     )
   }
 
+  if (options.metaMask !== false) {
+    if (typeof window !== 'undefined') {
+      wallets.push(
+        metaMask({
+          dappMetadata: {
+            name: appName,
+            url: window.location.origin,
+            iconUrl: `https://www.google.com/s2/favicons?domain_url=${window.location.origin}`
+          }
+        })
+      )
+    }
+  }
+
+  if (options.coinbase !== false) {
+    wallets.push(
+      coinbaseWallet({
+        appName
+      })
+    )
+  }
+
   if (options.walletConnect || options.walletConnectProjectId) {
     const projectId = (options.walletConnect && options.walletConnect?.projectId) || options.walletConnectProjectId!
 
     wallets.push(
       walletConnect({
-        projectId
+        projectId,
+        defaultNetwork: defaultChainId
       })
     )
   }

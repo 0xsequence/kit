@@ -1,9 +1,10 @@
 import { AddFundsSettings } from '../contexts'
 
 export const TRANSAK_API_KEY = '5911d9ec-46b5-48fa-a755-d59a715ff0cf'
+export const TRANSAK_PROXY_ADDRESS = '0x4a598b7ec77b1562ad0df7dc64a162695ce4c78a'
 
 export const getTransakLink = (addFundsSettings: AddFundsSettings) => {
-  const defaultNetworks = 'ethereum,mainnet,arbitrum,optimism,polygon,polygonzkevm,zksync,base,bnb,oasys,astar,avaxcchain'
+  const defaultNetworks = 'ethereum,mainnet,arbitrum,optimism,polygon,polygonzkevm,zksync,base,bnb,oasys,astar,avaxcchain,immutablezkevm'
 
   interface Options {
     [index: string]: string | undefined
@@ -13,10 +14,12 @@ export const getTransakLink = (addFundsSettings: AddFundsSettings) => {
     apiKey: TRANSAK_API_KEY,
     referrerDomain: window.location.origin,
     walletAddress: addFundsSettings.walletAddress,
+    fiatAmount: addFundsSettings?.fiatAmount,
     fiatCurrency: addFundsSettings?.fiatCurrency,
     disableWalletAddressForm: 'true',
     defaultFiatAmount: addFundsSettings?.defaultFiatAmount || '50',
     defaultCryptoCurrency: addFundsSettings?.defaultCryptoCurrency || 'USDC',
+    cryptoCurrencyList: addFundsSettings?.cryptoCurrencyList,
     networks: addFundsSettings?.networks || defaultNetworks
   }
 

@@ -1,5 +1,52 @@
 # @0xsequence/kit-wallet
 
+## 4.5.2
+
+### Patch Changes
+
+- Fixing walletconnect default chainId
+
+- Updated dependencies []:
+  - @0xsequence/kit@4.5.2
+
+## 4.5.1
+
+### Patch Changes
+
+- Updating onEmailConflict listeners to handle multiple providers
+
+- Updated dependencies []:
+  - @0xsequence/kit@4.5.1
+
+## 4.5.0
+
+### Minor Changes
+
+- Adding metamask connector
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @0xsequence/kit@4.5.0
+
+## 4.4.6
+
+### Patch Changes
+
+- Updating sequence to include fix for projectAccessKey sending to universal wallet
+
+- Updated dependencies []:
+  - @0xsequence/kit@4.4.6
+
+## 4.4.5
+
+### Patch Changes
+
+- Fixing waas time drift
+
+- Updated dependencies []:
+  - @0xsequence/kit@4.4.5
+
 ## 4.4.4
 
 ### Patch Changes
