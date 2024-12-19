@@ -1,5 +1,5 @@
 import { Box, Spinner, Text } from '@0xsequence/design-system'
-import { useProjectAccessKey, useContractInfo, useTokenMetadata } from '@0xsequence/kit'
+import { useProjectAccessKey, useContractInfo, useTokenMetadata, useAnalyticsContext } from '@0xsequence/kit'
 import { findSupportedNetwork } from '@0xsequence/network'
 import pako from 'pako'
 import { useEffect } from 'react'
@@ -7,6 +7,7 @@ import { formatUnits } from 'viem'
 
 import { fetchSardineOrderStatus } from '../api'
 import { TransactionPendingNavigation } from '../contexts'
+import { NFT_CHECKOUT_SOURCE } from '../constants'
 import { useNavigation, useCheckoutModal, useSardineClientToken, useTransactionStatusModal } from '../hooks'
 import { TRANSAK_PROXY_ADDRESS } from '../utils/transak'
 const POLLING_TIME = 10 * 1000
@@ -29,6 +30,7 @@ export const PendingCreditCardTransaction = () => {
 }
 
 export const PendingCreditCardTransactionTransak = () => {
+  const { analytics } = useAnalyticsContext()
   const { openTransactionStatusModal } = useTransactionStatusModal()
   const nav = useNavigation()
   const { settings, closeCheckout } = useCheckoutModal()
@@ -113,6 +115,24 @@ export const PendingCreditCardTransactionTransak = () => {
       if (message?.data?.event_id === 'TRANSAK_ORDER_SUCCESSFUL' && message?.data?.data?.status === 'COMPLETED') {
         console.log('Order Data: ', message?.data?.data)
         const txHash = message?.data?.data?.transactionHash || ''
+
+        analytics?.track({
+          event: 'SEND_TRANSACTION_REQUEST',
+          props: {
+            type: 'credit_card',
+            provider: 'transak',
+            source: NFT_CHECKOUT_SOURCE,
+            chainId: String(creditCardCheckout.chainId),
+            listedCurrency: creditCardCheckout.currencyAddress,
+            purchasedCurrency: creditCardCheckout.currencyAddress,
+            origin: window.location.origin,
+            from: creditCardCheckout.recipientAddress,
+            to: creditCardCheckout.contractAddress,
+            item_ids: JSON.stringify([creditCardCheckout.nftId]),
+            item_quantities: JSON.stringify([JSON.stringify([creditCardCheckout.nftQuantity])]),
+            txHash
+          }
+        })
 
         closeCheckout()
         openTransactionStatusModal({
@@ -212,6 +232,7 @@ export const PendingCreditCardTransactionTransak = () => {
 }
 
 export const PendingCreditCardTransactionSardine = () => {
+  const { analytics } = useAnalyticsContext()
   const { openTransactionStatusModal } = useTransactionStatusModal()
   const nav = useNavigation()
   const { settings, closeCheckout } = useCheckoutModal()
@@ -270,6 +291,24 @@ export const PendingCreditCardTransactionSardine = () => {
         return
       }
       if (status === 'Complete') {
+        analytics?.track({
+          event: 'SEND_TRANSACTION_REQUEST',
+          props: {
+            type: 'credit_card',
+            provider: 'sardine',
+            source: NFT_CHECKOUT_SOURCE,
+            chainId: String(creditCardCheckout.chainId),
+            listedCurrency: creditCardCheckout.currencyAddress,
+            purchasedCurrency: creditCardCheckout.currencyAddress,
+            origin: window.location.origin,
+            from: creditCardCheckout.recipientAddress,
+            to: creditCardCheckout.contractAddress,
+            item_ids: JSON.stringify([creditCardCheckout.nftId]),
+            item_quantities: JSON.stringify([JSON.stringify([creditCardCheckout.nftQuantity])]),
+            txHash: transactionHash
+          }
+        })
+
         closeCheckout()
         openTransactionStatusModal({
           chainId: creditCardCheckout.chainId,
