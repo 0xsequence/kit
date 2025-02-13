@@ -11,6 +11,7 @@ import {
   useKitWallets
 } from '@0xsequence/kit'
 import { useCheckoutModal, useAddFundsModal, useERC1155SaleContractPaymentModal, useSwapModal } from '@0xsequence/kit-checkout'
+import { TransactionOnRampProvider } from '@0xsequence/kit-checkout'
 import type { SwapModalSettings } from '@0xsequence/kit-checkout'
 import { CardButton, Header, WalletListItem } from '@0xsequence/kit-example-shared-components'
 import { useOpenWalletModal } from '@0xsequence/kit-wallet'
@@ -420,6 +421,7 @@ export const Connected = () => {
       currencyAddress,
       collectionAddress,
       creditCardProviders: ['sardine', 'transak'],
+      onRampProvider: TransactionOnRampProvider.transak,
       transakConfig: {
         contractId,
         apiKey: '5911d9ec-46b5-48fa-a755-d59a715ff0cf'
@@ -469,7 +471,8 @@ export const Connected = () => {
 
   const onClickAddFunds = () => {
     triggerAddFunds({
-      walletAddress: address || ''
+      walletAddress: address || '',
+      provider: TransactionOnRampProvider.transak
     })
   }
 
