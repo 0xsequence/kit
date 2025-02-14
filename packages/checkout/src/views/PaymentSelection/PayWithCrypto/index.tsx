@@ -81,12 +81,16 @@ export const PayWithCrypto = ({
   }
 
   const coins: Coin[] = [
-    {
-      index: 0,
-      name: currencyInfoData?.name || 'Unknown',
-      symbol: currencyInfoData?.symbol || '',
-      currencyAddress
-    },
+    ...(enableMainCurrencyPayment
+      ? [
+          {
+            index: 0,
+            name: currencyInfoData?.name || 'Unknown',
+            symbol: currencyInfoData?.symbol || '',
+            currencyAddress
+          }
+        ]
+      : []),
     ...swapPrices.map((price, index) => {
       return {
         index: index + 1,
@@ -97,6 +101,13 @@ export const PayWithCrypto = ({
     })
   ]
 
+  useEffect(() => {
+    if (enableMainCurrencyPayment) {
+      setSelectedCurrency(coins[0].currencyAddress)
+    } else if (!swapPricesIsLoading) {
+      setSelectedCurrency(swapPrices?.[0]?.info?.address)
+    }
+  }, [swapPricesIsLoading])
   const priceFormatted = formatUnits(BigInt(price), currencyInfoData?.decimals || 0)
   const priceDisplay = formatDisplay(priceFormatted, {
     disableScientificNotation: true,
@@ -120,7 +131,7 @@ export const PayWithCrypto = ({
     return (
       <Box flexDirection="column" justifyContent="center" alignItems="center" gap="2" width="full">
         {coins.map(coin => {
-          if (compareAddress(coin.currencyAddress, currencyAddress) && enableMainCurrencyPayment) {
+          if (compareAddress(coin.currencyAddress, currencyAddress)) {
             return (
               <Fragment key={currencyAddress}>
                 <CryptoOption
