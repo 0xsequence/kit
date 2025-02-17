@@ -74,7 +74,12 @@ export interface KitConfig {
     projectName?: string
     useMock?: boolean
   }
+  /**
+   * @deprecated Use `displayedContracts` and `displayedChainIds` instead.
+   */
   displayedAssets?: DisplayedAsset[]
+  displayedChainIds?: number[]
+  displayedContracts?: string[]
   readOnlyNetworks?: number[]
   ethAuth?: EthAuthSettings
 }
