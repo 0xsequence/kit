@@ -34,9 +34,9 @@ export const ConnectButton = (props: ConnectButtonProps) => {
 
   if (isDescriptive) {
     return (
-      <Tooltip message={label || walletProps.name}>
+      <Tooltip message={label || walletProps.name} side="bottom">
         <Card
-          gap="1"
+          gap="2"
           clickable
           justifyContent="center"
           alignItems="center"
@@ -44,7 +44,11 @@ export const ConnectButton = (props: ConnectButtonProps) => {
           width="full"
           style={{ height: BUTTON_HEIGHT_DESCRIPTIVE }}
         >
-          <Box as={Logo} width={ICON_SIZE_DESCRIPTIVE} height={ICON_SIZE_DESCRIPTIVE} />
+          <Box
+            as={Logo}
+            {...(walletProps.iconWidth ? { style: { width: walletProps.iconWidth } } : { width: ICON_SIZE_DESCRIPTIVE })}
+            height={ICON_SIZE_DESCRIPTIVE}
+          />
           <Text color="text100" variant="normal" fontWeight="bold">
             Continue with {label || walletProps.name}
           </Text>
@@ -54,7 +58,7 @@ export const ConnectButton = (props: ConnectButtonProps) => {
   }
 
   return (
-    <Tooltip message={label || walletProps.name}>
+    <Tooltip message={label || walletProps.name} side="bottom">
       <Card
         clickable
         justifyContent="center"
@@ -65,7 +69,11 @@ export const ConnectButton = (props: ConnectButtonProps) => {
           height: BUTTON_HEIGHT
         }}
       >
-        <Box as={Logo} width={ICON_SIZE} height={ICON_SIZE} />
+        <Box
+          as={Logo}
+          {...(walletProps.iconWidth ? { style: { width: walletProps.iconWidth } } : { width: ICON_SIZE })}
+          height={ICON_SIZE}
+        />
       </Card>
     </Tooltip>
   )
@@ -155,7 +163,7 @@ export const GoogleWaasConnectButton = (props: ConnectButtonProps) => {
   const buttonHeight = isDescriptive ? BUTTON_HEIGHT_DESCRIPTIVE : BUTTON_HEIGHT
 
   return (
-    <Tooltip message="Google" disabled={!enableGoogleTooltip}>
+    <Tooltip message="Google" disabled={!enableGoogleTooltip} side="bottom">
       <Card
         clickable
         background="transparent"
