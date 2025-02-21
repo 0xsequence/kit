@@ -1,4 +1,4 @@
-import { Box, Button, Spinner, Text } from '@0xsequence/design-system'
+import { Button, Spinner, Text } from '@0xsequence/design-system'
 import {
   CryptoOption,
   compareAddress,
@@ -163,15 +163,17 @@ export const Swap = () => {
   const SwapContent = () => {
     if (isLoading) {
       return (
-        <Box width="full" justifyContent="center" alignItems="center">
+        <div className="flex w-full justify-center items-center">
           <Spinner />
-        </Box>
+        </div>
       )
     } else if (noOptionsFound) {
       return (
-        <Box width="full" justifyContent="center" alignItems="center">
-          <Text variant="normal">No swap option found!</Text>
-        </Box>
+        <div className="flex w-full justify-center items-center">
+          <Text variant="normal" color="primary">
+            No swap option found!
+          </Text>
+        </div>
       )
     } else {
       const formattedPrice = formatUnits(BigInt(currencyAmount), mainCurrencyDecimals || 0)
@@ -182,11 +184,11 @@ export const Swap = () => {
       })
 
       return (
-        <Box width="full" gap="3" flexDirection="column">
-          <Text variant="normal" color="text100">
+        <div className="flex w-full gap-3 flex-col">
+          <Text variant="normal" color="primary">
             {description}
           </Text>
-          <Box width="full" flexDirection="column" gap="2">
+          <div className="flex w-full flex-col gap-2">
             {!disableMainCurrency && (
               <CryptoOption
                 key={currencyAddress}
@@ -229,13 +231,13 @@ export const Swap = () => {
                 />
               )
             })}
-          </Box>
+          </div>
           {isError && (
-            <Box width="full">
+            <div className="w-full">
               <Text color="negative" variant="small">
                 A problem occurred while executing the transaction.
               </Text>
-            </Box>
+            </div>
           )}
           <Button
             disabled={noOptionsFound || !selectedCurrency || quoteFetchInProgress || isTxsPending}
@@ -243,23 +245,19 @@ export const Swap = () => {
             label={quoteFetchInProgress ? 'Preparing swap...' : 'Proceed'}
             onClick={onClickProceed}
           />
-        </Box>
+        </div>
       )
     }
   }
 
   return (
-    <Box
-      flexDirection="column"
-      gap="2"
-      alignItems="flex-start"
-      paddingBottom="6"
-      paddingX="6"
+    <div
+      className="flex flex-col gap-2 items-start pb-6 px-6"
       style={{
         paddingTop: HEADER_HEIGHT
       }}
     >
       <SwapContent />
-    </Box>
+    </div>
   )
 }
