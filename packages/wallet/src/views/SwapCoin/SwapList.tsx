@@ -12,7 +12,7 @@ import {
   useClearCachedBalances,
   useCurrencyInfo
 } from '@0xsequence/kit'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { zeroAddress, formatUnits, Hex } from 'viem'
 import { useAccount, useChainId, usePublicClient, useSwitchChain, useWalletClient } from 'wagmi'
 
@@ -59,6 +59,12 @@ export const SwapList = ({ chainId, contractAddress, amount }: SwapListProps) =>
     },
     { disabled: false }
   )
+
+  useEffect(() => {
+    if (!swapPricesIsLoading && swapPrices.length > 0) {
+      setSelectedCurrency(swapPrices[0].info?.address)
+    }
+  }, [swapPricesIsLoading])
 
   const { data: currencyInfo, isLoading: isLoadingCurrencyInfo } = useCurrencyInfo({ chainId, currencyAddress: contractAddress })
 
