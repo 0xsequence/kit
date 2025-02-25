@@ -1,6 +1,6 @@
 import { sequence } from '0xsequence'
-import { SequenceWaaS, FeeOption } from '@0xsequence/waas'
 import { SequenceIndexer, TransactionStatus, TransactionReceipt } from '@0xsequence/indexer'
+import { SequenceWaaS, FeeOption } from '@0xsequence/waas'
 import { PublicClient, WalletClient, Hex } from 'viem'
 import { Connector } from 'wagmi'
 
@@ -101,7 +101,10 @@ export const sendTransactions = async ({
     }
 
     if (!transactionsFeeOption) {
-      throw new FeeOptionInsufficientFundsError(`Transaction fee option with valid user balance not found: ${resp.data.feeOptions.map(f => f.token.symbol).join(', ')}`, resp.data.feeOptions)
+      throw new FeeOptionInsufficientFundsError(
+        `Transaction fee option with valid user balance not found: ${resp.data.feeOptions.map(f => f.token.symbol).join(', ')}`,
+        resp.data.feeOptions
+      )
     }
 
     const response = await sequenceWaaS.sendTransaction({
