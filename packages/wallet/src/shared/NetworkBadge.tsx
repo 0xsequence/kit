@@ -1,5 +1,5 @@
 import { Box, NetworkImage, Text } from '@0xsequence/design-system'
-import { getNetwork, getNetworkColor, getNetworkBackgroundColor } from '@0xsequence/kit'
+import { getNetwork, getNetworkBackgroundColor, getNetworkColor } from '@0xsequence/kit'
 import React from 'react'
 
 interface NetworkBadgeProps {

@@ -1,7 +1,7 @@
-import { Box, Button, Text, CopyIcon, ShareIcon, Image } from '@0xsequence/design-system'
+import { Box, Button, CopyIcon, Image, ShareIcon, Text } from '@0xsequence/design-system'
 import { getNativeTokenInfoByChainId } from '@0xsequence/kit'
 import { QRCodeCanvas } from 'qrcode.react'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard'
 import { useAccount, useConfig } from 'wagmi'
 

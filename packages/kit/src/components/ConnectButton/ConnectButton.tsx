@@ -1,4 +1,4 @@
-import { Box, Card, Icon, EllipsisIcon, Text, Tooltip, useTheme } from '@0xsequence/design-system'
+import { Box, Card, EllipsisIcon, Text, Tooltip, useTheme } from '@0xsequence/design-system'
 import { GoogleLogin } from '@react-oauth/google'
 import { useEffect, useState } from 'react'
 import { appleAuthHelpers } from 'react-apple-signin-auth'

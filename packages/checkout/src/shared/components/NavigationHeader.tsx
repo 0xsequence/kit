@@ -1,4 +1,4 @@
-import { Box, IconButton, ChevronLeftIcon, Text, vars, ModalPrimitive } from '@0xsequence/design-system'
+import { Box, ChevronLeftIcon, IconButton, ModalPrimitive, Text, vars } from '@0xsequence/design-system'
 import React from 'react'
 
 import { HEADER_HEIGHT } from '../../constants'

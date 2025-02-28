@@ -1,4 +1,4 @@
-import { Box, Text, ChevronRightIcon } from '@0xsequence/design-system'
+import { Box, ChevronRightIcon, Text } from '@0xsequence/design-system'
 import React from 'react'
 
 import { Navigation } from '../../../contexts'

@@ -1,4 +1,4 @@
-import { Box, Button, SettingsIcon, ChevronRightIcon, CurrencyIcon, NetworkIcon, vars } from '@0xsequence/design-system'
+import { Box, Button, ChevronRightIcon, CurrencyIcon, NetworkIcon, SettingsIcon, vars } from '@0xsequence/design-system'
 import React from 'react'
 
 import { HEADER_HEIGHT } from '../../constants'

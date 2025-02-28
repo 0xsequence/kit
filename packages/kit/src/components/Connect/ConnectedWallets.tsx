@@ -1,7 +1,7 @@
 import { LinkedWallet } from '@0xsequence/api'
 import { Box } from '@0xsequence/design-system'
-import { motion, AnimatePresence } from 'framer-motion'
-import React, { useMemo, useEffect, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import React, { useEffect, useMemo, useRef } from 'react'
 
 import { KitWallet } from '../../hooks/useKitWallets'
 

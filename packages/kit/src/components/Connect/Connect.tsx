@@ -4,15 +4,15 @@ import {
   ArrowRightIcon,
   Box,
   Divider,
-  Text,
-  TextInput,
-  Spinner,
-  Image,
   IconButton,
-  ModalPrimitive
+  Image,
+  ModalPrimitive,
+  Spinner,
+  Text,
+  TextInput
 } from '@0xsequence/design-system'
 import { genUserId } from '@databeat/tracker'
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { appleAuthHelpers, useScript } from 'react-apple-signin-auth'
 import { useConnect, useConnections, useSignMessage } from 'wagmi'
 

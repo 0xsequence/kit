@@ -1,4 +1,4 @@
-import { Box, Button, ChevronRightIcon, Text, vars, Card, GradientAvatar, Spinner } from '@0xsequence/design-system'
+import { Box, Button, Card, ChevronRightIcon, GradientAvatar, Spinner, Text, vars } from '@0xsequence/design-system'
 import { truncateAtMiddle, useIndexerClient } from '@0xsequence/kit'
 import { useQuery } from '@tanstack/react-query'
 import React, { useState } from 'react'

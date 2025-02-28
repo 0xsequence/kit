@@ -1,5 +1,3 @@
-import Fuse from 'fuse.js'
-import { useState } from 'react'
 import {
   ArrowRightIcon,
   Box,
@@ -12,9 +10,11 @@ import {
   Text,
   useTheme
 } from '@0xsequence/design-system'
+import Fuse from 'fuse.js'
+import { useState } from 'react'
 
-import { getLogo } from '../ConnectButton'
 import { ExtendedConnector } from '../../types'
+import { getLogo } from '../ConnectButton'
 
 interface ExtendedWalletListProps {
   onConnect: (connector: ExtendedConnector) => void
